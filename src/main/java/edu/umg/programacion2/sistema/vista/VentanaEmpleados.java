@@ -1,12 +1,18 @@
 package edu.umg.programacion2.sistema.vista;
-import java.awt.BorderLayout; 
-import java.awt.Color; 
-import java.awt.Font; 
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridLayout;
+import java.math.BigDecimal;
+import java.sql.SQLException;
+import java.util.List;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -14,268 +20,622 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
+import edu.umg.programacion2.sistema.modelo.Empleado;
+import edu.umg.programacion2.sistema.servicio.EmpleadoServicio;
+
 public class VentanaEmpleados extends JFrame {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	// ==============================
-	// COLORES
-	// ==============================
+    // =========================
+    // COLORES
+    // =========================
 
-	private static final Color ROJO_OSCURO = new Color(128, 0, 32);
-	private static final Color ROJO = new Color(180, 30, 50);
-	private static final Color ROJO_CLARO = new Color(245, 225, 230);
-	private static final Color BLANCO = Color.WHITE;
-	private static final Color GRIS_TEXTO = new Color(60, 60, 60);
+    private static final Color ROJO_OSCURO = new Color(128, 0, 32);
+    private static final Color ROJO = new Color(180, 30, 50);
+    private static final Color ROJO_CLARO = new Color(245, 225, 230);
+    private static final Color BLANCO = Color.WHITE;
+    private static final Color GRIS_TEXTO = new Color(60, 60, 60);
 
-	// ==============================
-	// COMPONENTES
-	// ==============================
+    // =========================
+    // COMPONENTES
+    // =========================
 
-	private JPanel contentPane;
+    private JPanel contentPane;
 
-	private JTextField txtNombre;
-	private JTextField txtPuesto;
-	private JTextField txtSalario;
+    private JTextField txtNombre;
+    private JTextField txtPuesto;
+    private JTextField txtSalario;
+    private JTextField txtTelefono;
+    private JTextField txtCorreo;
 
-	private JTable table;
+    private JTable table;
+    private DefaultTableModel modeloTabla;
 
-	private DefaultTableModel modeloTabla;
+    // =========================
+    // SERVICIO
+    // =========================
 
-	// ==============================
-	// CONSTRUCTOR
-	// ==============================
+    private EmpleadoServicio empleadoServicio;
 
-	public VentanaEmpleados() {
+    // ID del empleado seleccionado
+    private int idEmpleadoSeleccionado = 0;
 
-		setTitle("Sistema de Empleados");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setSize(900, 600);
-		setLocationRelativeTo(null);
+    // =========================
+    // CONSTRUCTOR
+    // =========================
 
-		// ==============================
-		// PANEL PRINCIPAL
-		// ==============================
+    public VentanaEmpleados() {
 
-		contentPane = new JPanel();
-		contentPane.setBackground(BLANCO);
-		contentPane.setBorder(new EmptyBorder(15, 15, 15, 15));
-		contentPane.setLayout(new BorderLayout(15, 15));
+        empleadoServicio = new EmpleadoServicio();
 
-		setContentPane(contentPane);
+        setTitle("Sistema de Empleados");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(1000, 650);
+        setLocationRelativeTo(null);
 
-		// ==============================
-		// ENCABEZADO
-		// ==============================
+        contentPane = new JPanel();
+        contentPane.setBackground(BLANCO);
+        contentPane.setBorder(new EmptyBorder(15, 15, 15, 15));
+        contentPane.setLayout(new BorderLayout(15, 15));
 
-		JPanel panelTitulo = new JPanel();
-		panelTitulo.setBackground(ROJO_OSCURO);
+        setContentPane(contentPane);
 
-		JLabel lblTitulo = new JLabel("SISTEMA DE EMPLEADOS");
-		lblTitulo.setForeground(BLANCO);
-		lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 24));
+        // =========================
+        // TITULO
+        // =========================
 
-		panelTitulo.add(lblTitulo);
+        JPanel panelTitulo = new JPanel();
+        panelTitulo.setBackground(ROJO_OSCURO);
 
-		contentPane.add(panelTitulo, BorderLayout.NORTH);
+        JLabel lblTitulo = new JLabel("SISTEMA DE EMPLEADOS");
+        lblTitulo.setForeground(BLANCO);
+        lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 24));
 
-		// ==============================
-		// PANEL CENTRAL
-		// ==============================
+        panelTitulo.add(lblTitulo);
 
-		JPanel panelCentral = new JPanel();
-		panelCentral.setBackground(BLANCO);
-		panelCentral.setLayout(new BorderLayout(15, 15));
+        contentPane.add(panelTitulo, BorderLayout.NORTH);
 
-		contentPane.add(panelCentral, BorderLayout.CENTER);
+        // =========================
+        // PANEL CENTRAL
+        // =========================
 
-		// ==============================
-		// FORMULARIO
-		// ==============================
+        JPanel panelCentral = new JPanel();
+        panelCentral.setBackground(BLANCO);
+        panelCentral.setLayout(new BorderLayout(15, 15));
 
-		JPanel panelFormulario = new JPanel();
+        contentPane.add(panelCentral, BorderLayout.CENTER);
 
-		panelFormulario.setBackground(ROJO_CLARO);
-		panelFormulario.setBorder(
-			BorderFactory.createCompoundBorder(
-				BorderFactory.createLineBorder(ROJO_OSCURO),
-				BorderFactory.createEmptyBorder(15, 15, 15, 15)
-			)
-		);
+        // =========================
+        // FORMULARIO
+        // =========================
 
-		panelFormulario.setLayout(new GridLayout(4, 2, 10, 10));
+        JPanel panelFormulario = new JPanel();
 
-		// Nombre completo
+        panelFormulario.setBackground(ROJO_CLARO);
 
-		JLabel lblNombre = new JLabel("Nombre completo:");
-		lblNombre.setFont(new Font("Tahoma", Font.BOLD, 14));
-		lblNombre.setForeground(GRIS_TEXTO);
+        panelFormulario.setBorder(
+            BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(ROJO_OSCURO),
+                BorderFactory.createEmptyBorder(15, 15, 15, 15)
+            )
+        );
 
-		panelFormulario.add(lblNombre);
+        panelFormulario.setLayout(new GridLayout(6, 2, 10, 10));
 
-		txtNombre = new JTextField();
-		txtNombre.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        // NOMBRE
 
-		panelFormulario.add(txtNombre);
+        JLabel lblNombre = new JLabel("Nombre completo:");
+        lblNombre.setFont(new Font("Tahoma", Font.BOLD, 14));
+        lblNombre.setForeground(GRIS_TEXTO);
 
-		// Puesto
+        panelFormulario.add(lblNombre);
 
-		JLabel lblPuesto = new JLabel("Puesto:");
-		lblPuesto.setFont(new Font("Tahoma", Font.BOLD, 14));
-		lblPuesto.setForeground(GRIS_TEXTO);
+        txtNombre = new JTextField();
+        txtNombre.setFont(new Font("Tahoma", Font.PLAIN, 14));
 
-		panelFormulario.add(lblPuesto);
+        panelFormulario.add(txtNombre);
 
-		txtPuesto = new JTextField();
-		txtPuesto.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        // PUESTO
 
-		panelFormulario.add(txtPuesto);
+        JLabel lblPuesto = new JLabel("Puesto:");
+        lblPuesto.setFont(new Font("Tahoma", Font.BOLD, 14));
+        lblPuesto.setForeground(GRIS_TEXTO);
 
-		// Salario
+        panelFormulario.add(lblPuesto);
 
-		JLabel lblSalario = new JLabel("Salario:");
-		lblSalario.setFont(new Font("Tahoma", Font.BOLD, 14));
-		lblSalario.setForeground(GRIS_TEXTO);
+        txtPuesto = new JTextField();
+        txtPuesto.setFont(new Font("Tahoma", Font.PLAIN, 14));
 
-		panelFormulario.add(lblSalario);
+        panelFormulario.add(txtPuesto);
 
-		txtSalario = new JTextField();
-		txtSalario.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        // SALARIO
 
-		panelFormulario.add(txtSalario);
+        JLabel lblSalario = new JLabel("Salario:");
+        lblSalario.setFont(new Font("Tahoma", Font.BOLD, 14));
+        lblSalario.setForeground(GRIS_TEXTO);
 
-		// ==============================
-		// BOTÓN GUARDAR
-		// ==============================
+        panelFormulario.add(lblSalario);
 
-		JButton btnGuardar = new JButton("GUARDAR");
+        txtSalario = new JTextField();
+        txtSalario.setFont(new Font("Tahoma", Font.PLAIN, 14));
 
-		btnGuardar.setBackground(ROJO_OSCURO);
-		btnGuardar.setForeground(BLANCO);
-		btnGuardar.setFont(new Font("Tahoma", Font.BOLD, 13));
-		btnGuardar.setFocusPainted(false);
+        panelFormulario.add(txtSalario);
 
-		panelFormulario.add(btnGuardar);
+        // TELEFONO
 
-		// ==============================
-		// BOTÓN LIMPIAR
-		// ==============================
+        JLabel lblTelefono = new JLabel("Teléfono:");
+        lblTelefono.setFont(new Font("Tahoma", Font.BOLD, 14));
+        lblTelefono.setForeground(GRIS_TEXTO);
 
-		JButton btnLimpiar = new JButton("LIMPIAR");
+        panelFormulario.add(lblTelefono);
 
-		btnLimpiar.setBackground(ROJO);
-		btnLimpiar.setForeground(BLANCO);
-		btnLimpiar.setFont(new Font("Tahoma", Font.BOLD, 13));
-		btnLimpiar.setFocusPainted(false);
+        txtTelefono = new JTextField();
+        txtTelefono.setFont(new Font("Tahoma", Font.PLAIN, 14));
 
-		panelFormulario.add(btnLimpiar);
+        panelFormulario.add(txtTelefono);
 
-		panelCentral.add(panelFormulario, BorderLayout.NORTH);
+        // CORREO
 
-		// ==============================
-		// TÍTULO DE LA TABLA
-		// ==============================
+        JLabel lblCorreo = new JLabel("Correo:");
+        lblCorreo.setFont(new Font("Tahoma", Font.BOLD, 14));
+        lblCorreo.setForeground(GRIS_TEXTO);
 
-		JPanel panelTabla = new JPanel();
-		panelTabla.setBackground(BLANCO);
-		panelTabla.setLayout(new BorderLayout(5, 5));
+        panelFormulario.add(lblCorreo);
 
-		JLabel lblLista = new JLabel("Lista de empleados");
-		lblLista.setForeground(ROJO_OSCURO);
-		lblLista.setFont(new Font("Tahoma", Font.BOLD, 18));
+        txtCorreo = new JTextField();
+        txtCorreo.setFont(new Font("Tahoma", Font.PLAIN, 14));
 
-		panelTabla.add(lblLista, BorderLayout.NORTH);
+        panelFormulario.add(txtCorreo);
 
-		// ==============================
-		// TABLA
-		// ==============================
+        // BOTONES
 
-		modeloTabla = new DefaultTableModel(
-			new Object[][] {},
-			new String[] {
-				"ID",
-				"Nombre completo",
-				"Puesto",
-				"Salario"
-			}
-		);
+        JButton btnGuardar = new JButton("GUARDAR");
+        btnGuardar.setBackground(ROJO_OSCURO);
+        btnGuardar.setForeground(BLANCO);
+        btnGuardar.setFont(new Font("Tahoma", Font.BOLD, 13));
+        btnGuardar.setFocusPainted(false);
 
-		table = new JTable(modeloTabla);
+        panelFormulario.add(btnGuardar);
 
-		table.setFont(new Font("Tahoma", Font.PLAIN, 13));
-		table.setRowHeight(28);
-		table.setBackground(BLANCO);
-		table.setForeground(GRIS_TEXTO);
-		table.setGridColor(ROJO_CLARO);
+        JButton btnModificar = new JButton("MODIFICAR");
+        btnModificar.setBackground(ROJO);
+        btnModificar.setForeground(BLANCO);
+        btnModificar.setFont(new Font("Tahoma", Font.BOLD, 13));
+        btnModificar.setFocusPainted(false);
 
-		// Encabezado de tabla
+        panelFormulario.add(btnModificar);
 
-		table.getTableHeader().setBackground(ROJO_OSCURO);
-		table.getTableHeader().setForeground(BLANCO);
-		table.getTableHeader().setFont(
-			new Font("Tahoma", Font.BOLD, 13)
-		);
+        panelCentral.add(panelFormulario, BorderLayout.NORTH);
 
-		JScrollPane scrollPane = new JScrollPane(table);
+        // =========================
+        // TABLA
+        // =========================
 
-		panelTabla.add(scrollPane, BorderLayout.CENTER);
+        JPanel panelTabla = new JPanel();
+        panelTabla.setBackground(BLANCO);
+        panelTabla.setLayout(new BorderLayout(5, 5));
 
-		panelCentral.add(panelTabla, BorderLayout.CENTER);
+        JLabel lblLista = new JLabel("Lista de empleados");
+        lblLista.setForeground(ROJO_OSCURO);
+        lblLista.setFont(new Font("Tahoma", Font.BOLD, 18));
 
-		// ==============================
-		// BOTÓN LIMPIAR
-		// ==============================
+        panelTabla.add(lblLista, BorderLayout.NORTH);
 
-		btnLimpiar.addActionListener(e -> {
+        modeloTabla = new DefaultTableModel(
+            new Object[][] {},
+            new String[] {
+                "ID",
+                "Nombre completo",
+                "Puesto",
+                "Salario",
+                "Teléfono",
+                "Correo"
+            }
+        ) {
 
-			txtNombre.setText("");
-			txtPuesto.setText("");
-			txtSalario.setText("");
+            private static final long serialVersionUID = 1L;
 
-			txtNombre.requestFocus();
-		});
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
 
-		// ==============================
-		// BOTÓN GUARDAR
-		// ==============================
+        table = new JTable(modeloTabla);
 
-		btnGuardar.addActionListener(e -> {
+        table.setFont(new Font("Tahoma", Font.PLAIN, 13));
+        table.setRowHeight(28);
+        table.setBackground(BLANCO);
+        table.setForeground(GRIS_TEXTO);
+        table.setGridColor(ROJO_CLARO);
 
-			String nombre = txtNombre.getText();
-			String puesto = txtPuesto.getText();
-			String salario = txtSalario.getText();
+        table.getTableHeader().setBackground(ROJO_OSCURO);
+        table.getTableHeader().setForeground(BLANCO);
+        table.getTableHeader().setFont(new Font("Tahoma", Font.BOLD, 13));
 
-			if (!nombre.isEmpty() && !puesto.isEmpty() && !salario.isEmpty()) {
+        JScrollPane scrollPane = new JScrollPane(table);
 
-				int id = modeloTabla.getRowCount() + 1;
+        panelTabla.add(scrollPane, BorderLayout.CENTER);
 
-				modeloTabla.addRow(
-					new Object[] {
-						id,
-						nombre,
-						puesto,
-						salario
-					}
-				);
+        panelCentral.add(panelTabla, BorderLayout.CENTER);
 
-				txtNombre.setText("");
-				txtPuesto.setText("");
-				txtSalario.setText("");
+        // =========================
+        // PANEL DE BOTONES INFERIOR
+        // =========================
 
-				txtNombre.requestFocus();
-			}
-		});
-	}
+        JPanel panelBotones = new JPanel();
+        panelBotones.setBackground(BLANCO);
 
-	// ==============================
-	// MÉTODO MAIN
-	// ==============================
+        JButton btnEliminar = new JButton("ELIMINAR");
+        btnEliminar.setBackground(ROJO_OSCURO);
+        btnEliminar.setForeground(BLANCO);
+        btnEliminar.setFont(new Font("Tahoma", Font.BOLD, 13));
+        btnEliminar.setFocusPainted(false);
 
-	public static void main(String[] args) {
+        JButton btnLimpiar = new JButton("LIMPIAR");
+        btnLimpiar.setBackground(ROJO);
+        btnLimpiar.setForeground(BLANCO);
+        btnLimpiar.setFont(new Font("Tahoma", Font.BOLD, 13));
+        btnLimpiar.setFocusPainted(false);
 
-		VentanaEmpleados ventana = new VentanaEmpleados();
+        JButton btnActualizarLista = new JButton("ACTUALIZAR LISTA");
+        btnActualizarLista.setBackground(ROJO_OSCURO);
+        btnActualizarLista.setForeground(BLANCO);
+        btnActualizarLista.setFont(new Font("Tahoma", Font.BOLD, 13));
+        btnActualizarLista.setFocusPainted(false);
 
-		ventana.setVisible(true);
-	}
+        panelBotones.add(btnEliminar);
+        panelBotones.add(btnLimpiar);
+        panelBotones.add(btnActualizarLista);
+
+        contentPane.add(panelBotones, BorderLayout.SOUTH);
+
+        // =========================
+        // EVENTO GUARDAR
+        // =========================
+
+        btnGuardar.addActionListener(e -> guardarEmpleado());
+
+        // =========================
+        // EVENTO MODIFICAR
+        // =========================
+
+        btnModificar.addActionListener(e -> modificarEmpleado());
+
+        // =========================
+        // EVENTO ELIMINAR
+        // =========================
+
+        btnEliminar.addActionListener(e -> eliminarEmpleado());
+
+        // =========================
+        // EVENTO LIMPIAR
+        // =========================
+
+        btnLimpiar.addActionListener(e -> limpiarCampos());
+
+        // =========================
+        // EVENTO ACTUALIZAR LISTA
+        // =========================
+
+        btnActualizarLista.addActionListener(e -> cargarEmpleados());
+
+        // =========================
+        // SELECCIONAR FILA
+        // =========================
+
+        table.getSelectionModel().addListSelectionListener(e -> {
+
+            if (!e.getValueIsAdjusting()) {
+
+                int fila = table.getSelectedRow();
+
+                if (fila >= 0) {
+
+                    idEmpleadoSeleccionado =
+                            Integer.parseInt(
+                                    table.getValueAt(fila, 0).toString()
+                            );
+
+                    txtNombre.setText(
+                            table.getValueAt(fila, 1).toString()
+                    );
+
+                    txtPuesto.setText(
+                            table.getValueAt(fila, 2).toString()
+                    );
+
+                    txtSalario.setText(
+                            table.getValueAt(fila, 3).toString()
+                    );
+
+                    txtTelefono.setText(
+                            table.getValueAt(fila, 4).toString()
+                    );
+
+                    txtCorreo.setText(
+                            table.getValueAt(fila, 5).toString()
+                    );
+                }
+            }
+        });
+
+        // =========================
+        // CARGAR DATOS AL INICIAR
+        // =========================
+
+        cargarEmpleados();
+    }
+
+    // =====================================================
+    // GUARDAR EMPLEADO
+    // =====================================================
+
+    private void guardarEmpleado() {
+
+        try {
+
+            if (!validarCampos()) {
+                return;
+            }
+
+            Empleado empleado = new Empleado();
+
+            empleado.setNombreCompleto(txtNombre.getText().trim());
+            empleado.setPuesto(txtPuesto.getText().trim());
+
+            empleado.setSalario(
+                    new BigDecimal(txtSalario.getText().trim())
+            );
+
+            empleado.setTelefono(txtTelefono.getText().trim());
+            empleado.setCorreo(txtCorreo.getText().trim());
+
+            empleadoServicio.guardar(empleado);
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Empleado guardado correctamente.",
+                    "Éxito",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+
+            limpiarCampos();
+            cargarEmpleados();
+
+        } catch (NumberFormatException ex) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "El salario debe ser un número válido.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+        } catch (SQLException ex) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Error al guardar el empleado:\n" + ex.getMessage(),
+                    "Error de base de datos",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+    // =====================================================
+    // MODIFICAR EMPLEADO
+    // =====================================================
+
+    private void modificarEmpleado() {
+
+        try {
+
+            if (idEmpleadoSeleccionado == 0) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Seleccione un empleado de la tabla.",
+                        "Aviso",
+                        JOptionPane.WARNING_MESSAGE
+                );
+
+                return;
+            }
+
+            if (!validarCampos()) {
+                return;
+            }
+
+            Empleado empleado = new Empleado();
+
+            empleado.setIdEmpleado(idEmpleadoSeleccionado);
+            empleado.setNombreCompleto(txtNombre.getText().trim());
+            empleado.setPuesto(txtPuesto.getText().trim());
+
+            empleado.setSalario(
+                    new BigDecimal(txtSalario.getText().trim())
+            );
+
+            empleado.setTelefono(txtTelefono.getText().trim());
+            empleado.setCorreo(txtCorreo.getText().trim());
+
+            empleadoServicio.actualizar(empleado);
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Empleado modificado correctamente.",
+                    "Éxito",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+
+            limpiarCampos();
+            cargarEmpleados();
+
+        } catch (NumberFormatException ex) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "El salario debe ser un número válido.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+        } catch (SQLException ex) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Error al modificar el empleado:\n" + ex.getMessage(),
+                    "Error de base de datos",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+    // =====================================================
+    // ELIMINAR EMPLEADO
+    // =====================================================
+
+    private void eliminarEmpleado() {
+
+        try {
+
+            if (idEmpleadoSeleccionado == 0) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Seleccione un empleado de la tabla.",
+                        "Aviso",
+                        JOptionPane.WARNING_MESSAGE
+                );
+
+                return;
+            }
+
+            int respuesta = JOptionPane.showConfirmDialog(
+                    this,
+                    "¿Está seguro de eliminar este empleado?",
+                    "Confirmar eliminación",
+                    JOptionPane.YES_NO_OPTION
+            );
+
+            if (respuesta != JOptionPane.YES_OPTION) {
+                return;
+            }
+
+            empleadoServicio.eliminar(idEmpleadoSeleccionado);
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Empleado eliminado correctamente.",
+                    "Éxito",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+
+            limpiarCampos();
+            cargarEmpleados();
+
+        } catch (SQLException ex) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Error al eliminar el empleado:\n" + ex.getMessage(),
+                    "Error de base de datos",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+    // =====================================================
+    // CARGAR EMPLEADOS
+    // =====================================================
+
+    private void cargarEmpleados() {
+
+        try {
+
+            List<Empleado> empleados = empleadoServicio.listar();
+
+            modeloTabla.setRowCount(0);
+
+            for (Empleado empleado : empleados) {
+
+                modeloTabla.addRow(
+                        new Object[] {
+                            empleado.getIdEmpleado(),
+                            empleado.getNombreCompleto(),
+                            empleado.getPuesto(),
+                            empleado.getSalario(),
+                            empleado.getTelefono(),
+                            empleado.getCorreo()
+                        }
+                );
+            }
+
+        } catch (SQLException ex) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Error al cargar los empleados:\n" + ex.getMessage(),
+                    "Error de base de datos",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+    // =====================================================
+    // LIMPIAR CAMPOS
+    // =====================================================
+
+    private void limpiarCampos() {
+
+        txtNombre.setText("");
+        txtPuesto.setText("");
+        txtSalario.setText("");
+        txtTelefono.setText("");
+        txtCorreo.setText("");
+
+        idEmpleadoSeleccionado = 0;
+
+        table.clearSelection();
+
+        txtNombre.requestFocus();
+    }
+
+    // =====================================================
+    // VALIDAR CAMPOS
+    // =====================================================
+
+    private boolean validarCampos() {
+
+        if (txtNombre.getText().trim().isEmpty()
+                || txtPuesto.getText().trim().isEmpty()
+                || txtSalario.getText().trim().isEmpty()
+                || txtTelefono.getText().trim().isEmpty()
+                || txtCorreo.getText().trim().isEmpty()) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Todos los campos son obligatorios.",
+                    "Aviso",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return false;
+        }
+
+        return true;
+    }
+
+    // =====================================================
+    // MAIN
+    // =====================================================
+
+    public static void main(String[] args) {
+
+        VentanaEmpleados ventana = new VentanaEmpleados();
+
+        ventana.setVisible(true);
+    }
 }
-

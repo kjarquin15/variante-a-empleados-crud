@@ -8,7 +8,7 @@ public class ConexionBD {
             "jdbc:mysql://localhost:3306/sistema_crud?useSSL=false&serverTimezone=UTC";
 
     private static final String USUARIO = "root";
-    private static final String PASSWORD = "NoOlvidarQuitarParaSubirAGit";
+    private static final String PASSWORD = "QuitarContra";
 
     public static Connection conectar() throws SQLException {
         return DriverManager.getConnection(URL, USUARIO, PASSWORD);

@@ -609,15 +609,87 @@ public class VentanaEmpleados extends JFrame {
 
     private boolean validarCampos() {
 
-        if (txtNombre.getText().trim().isEmpty()
-                || txtPuesto.getText().trim().isEmpty()
-                || txtSalario.getText().trim().isEmpty()
-                || txtTelefono.getText().trim().isEmpty()
-                || txtCorreo.getText().trim().isEmpty()) {
+        String nombre = txtNombre.getText().trim();
+        String puesto = txtPuesto.getText().trim();
+        String salario = txtSalario.getText().trim();
+        String telefono = txtTelefono.getText().trim();
+        String correo = txtCorreo.getText().trim();
+
+        // Validar campos vacíos
+        if (nombre.isEmpty() || puesto.isEmpty() || salario.isEmpty()
+                || telefono.isEmpty() || correo.isEmpty()) {
 
             JOptionPane.showMessageDialog(
                     this,
                     "Todos los campos son obligatorios.",
+                    "Aviso",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return false;
+        }
+
+        // Validar nombre
+        if (nombre.length() > 50) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "El nombre completo no puede superar los 50 caracteres.",
+                    "Aviso",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return false;
+        }
+
+        // Validar salario
+        try {
+
+            BigDecimal valorSalario = new BigDecimal(salario);
+
+            if (valorSalario.compareTo(BigDecimal.ZERO) <= 0) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "El salario debe ser mayor que 0.",
+                        "Aviso",
+                        JOptionPane.WARNING_MESSAGE
+                );
+
+                return false;
+            }
+
+        } catch (NumberFormatException e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "El salario debe contener únicamente un número válido.",
+                    "Aviso",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return false;
+        }
+
+        // Validar teléfono
+        if (!telefono.matches("\\d+")) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "El teléfono debe contener únicamente números.",
+                    "Aviso",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return false;
+        }
+
+        // Validar correo
+        if (!correo.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Ingrese un correo electrónico válido.",
                     "Aviso",
                     JOptionPane.WARNING_MESSAGE
             );

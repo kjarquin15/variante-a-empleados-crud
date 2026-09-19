@@ -13,8 +13,8 @@ public class EmpleadoDAO {
 
         String sql = """
                 INSERT INTO empleados
-                (nombre_completo, puesto,contrato, salario, telefono, correo)
-                VALUES (?, ?, ?, ?, ?)
+                (nombre_completo, puesto, contrato, salario, telefono, correo)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """;
 
         try (Connection conexion = ConexionBD.conectar();
@@ -38,7 +38,7 @@ public class EmpleadoDAO {
 
         String sql = """
                 SELECT id_empleado, nombre_completo, puesto,
-                       salario, telefono, correo
+                       salario, telefono, correo, contrato
                 FROM empleados
                 """;
 
@@ -56,6 +56,7 @@ public class EmpleadoDAO {
                 empleado.setSalario(resultado.getBigDecimal("salario"));
                 empleado.setTelefono(resultado.getString("telefono"));
                 empleado.setCorreo(resultado.getString("correo"));
+                empleado.setContrato(resultado.getString("contrato"));
 
                 empleados.add(empleado);
             }
@@ -74,6 +75,7 @@ public class EmpleadoDAO {
                     salario = ?,
                     telefono = ?,
                     correo = ?
+                    contrato = ?
                 WHERE id_empleado = ?
                 """;
 
@@ -85,7 +87,8 @@ public class EmpleadoDAO {
             sentencia.setBigDecimal(3, empleado.getSalario());
             sentencia.setString(4, empleado.getTelefono());
             sentencia.setString(5, empleado.getCorreo());
-            sentencia.setInt(6, empleado.getIdEmpleado());
+            sentencia.setString(6, empleado.getContrato());
+            sentencia.setInt(7, empleado.getIdEmpleado());
 
             sentencia.executeUpdate();
         }

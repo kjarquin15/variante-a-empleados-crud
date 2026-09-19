@@ -19,7 +19,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
-
+import javax.swing.JComboBox;
 import edu.umg.programacion2.sistema.modelo.Empleado;
 import edu.umg.programacion2.sistema.servicio.EmpleadoServicio;
 
@@ -48,6 +48,7 @@ public class VentanaEmpleados extends JFrame {
     private JTextField txtSalario;
     private JTextField txtTelefono;
     private JTextField txtCorreo;
+    private JComboBox<String> cmbContrato;
 
     private JTable table;
     private DefaultTableModel modeloTabla;
@@ -121,7 +122,7 @@ public class VentanaEmpleados extends JFrame {
             )
         );
 
-        panelFormulario.setLayout(new GridLayout(6, 2, 10, 10));
+        panelFormulario.setLayout(new GridLayout(7, 2, 10, 10));
 
         // NOMBRE
 
@@ -187,6 +188,21 @@ public class VentanaEmpleados extends JFrame {
         txtCorreo.setFont(new Font("Tahoma", Font.PLAIN, 14));
 
         panelFormulario.add(txtCorreo);
+        
+
+     // TIPO DE CONTRATO
+     JLabel lblContrato = new JLabel("Tipo de contrato:");
+     lblContrato.setFont(new Font("Tahoma", Font.BOLD, 14));
+     lblContrato.setForeground(GRIS_TEXTO);
+     panelFormulario.add(lblContrato);
+
+     cmbContrato = new JComboBox<>();
+     cmbContrato.addItem("Seleccione...");
+     cmbContrato.addItem("Temporal");
+     cmbContrato.addItem("Permanente");
+     cmbContrato.addItem("Por hora");
+     cmbContrato.setFont(new Font("Tahoma", Font.PLAIN, 14));
+     panelFormulario.add(cmbContrato);
 
         // BOTONES
 
@@ -230,7 +246,8 @@ public class VentanaEmpleados extends JFrame {
                 "Puesto",
                 "Salario",
                 "Teléfono",
-                "Correo"
+                "Correo",
+                "Contrato"
             }
         ) {
 
@@ -357,6 +374,9 @@ public class VentanaEmpleados extends JFrame {
                     txtCorreo.setText(
                             table.getValueAt(fila, 5).toString()
                     );
+                    cmbContrato.setSelectedItem(
+                            table.getValueAt(fila, 6).toString()
+                    );
                 }
             }
         });
@@ -391,7 +411,9 @@ public class VentanaEmpleados extends JFrame {
 
             empleado.setTelefono(txtTelefono.getText().trim());
             empleado.setCorreo(txtCorreo.getText().trim());
-
+            empleado.setContrato(
+                    cmbContrato.getSelectedItem().toString()
+            );
             empleadoServicio.guardar(empleado);
 
             JOptionPane.showMessageDialog(
@@ -460,7 +482,9 @@ public class VentanaEmpleados extends JFrame {
 
             empleado.setTelefono(txtTelefono.getText().trim());
             empleado.setCorreo(txtCorreo.getText().trim());
-
+            empleado.setContrato(
+                    cmbContrato.getSelectedItem().toString()
+            );
             empleadoServicio.actualizar(empleado);
 
             JOptionPane.showMessageDialog(
@@ -568,7 +592,8 @@ public class VentanaEmpleados extends JFrame {
                             empleado.getPuesto(),
                             empleado.getSalario(),
                             empleado.getTelefono(),
-                            empleado.getCorreo()
+                            empleado.getCorreo(),
+                            empleado.getContrato()
                         }
                 );
             }
@@ -595,7 +620,7 @@ public class VentanaEmpleados extends JFrame {
         txtSalario.setText("");
         txtTelefono.setText("");
         txtCorreo.setText("");
-
+        cmbContrato.setSelectedIndex(0);
         idEmpleadoSeleccionado = 0;
 
         table.clearSelection();
@@ -614,6 +639,7 @@ public class VentanaEmpleados extends JFrame {
         String salario = txtSalario.getText().trim();
         String telefono = txtTelefono.getText().trim();
         String correo = txtCorreo.getText().trim();
+        String contrato = (String) cmbContrato.getSelectedItem();
 
         // Validar campos vacíos
         if (nombre.isEmpty() || puesto.isEmpty() || salario.isEmpty()
@@ -694,6 +720,15 @@ public class VentanaEmpleados extends JFrame {
                     JOptionPane.WARNING_MESSAGE
             );
 
+            return false;
+        }
+
+    
+        if (contrato == null || contrato.equals("Seleccione...")) {
+            JOptionPane.showMessageDialog(this,
+                    "Debe seleccionar un tipo de contrato.",
+                    "Aviso",
+                    JOptionPane.WARNING_MESSAGE);
             return false;
         }
 

@@ -72,10 +72,10 @@ public class EmpleadoDAO {
                 UPDATE empleados
                 SET nombre_completo = ?,
                     puesto = ?,
+                    contrato = ?,
                     salario = ?,
                     telefono = ?,
                     correo = ?
-                    contrato = ?
                 WHERE id_empleado = ?
                 """;
 
@@ -84,12 +84,12 @@ public class EmpleadoDAO {
 
             sentencia.setString(1, empleado.getNombreCompleto());
             sentencia.setString(2, empleado.getPuesto());
-            sentencia.setBigDecimal(3, empleado.getSalario());
-            sentencia.setString(4, empleado.getTelefono());
-            sentencia.setString(5, empleado.getCorreo());
-            sentencia.setString(6, empleado.getContrato());
+            sentencia.setString(3, empleado.getContrato());
+            sentencia.setBigDecimal(4, empleado.getSalario());
+            sentencia.setString(5, empleado.getTelefono());
+            sentencia.setString(6, empleado.getCorreo());
             sentencia.setInt(7, empleado.getIdEmpleado());
-
+            
             sentencia.executeUpdate();
         }
     }

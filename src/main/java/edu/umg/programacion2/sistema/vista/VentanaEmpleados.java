@@ -305,6 +305,15 @@ public class VentanaEmpleados extends JFrame {
         panelBotones.add(btnEliminar);
         panelBotones.add(btnLimpiar);
         panelBotones.add(btnActualizarLista);
+        
+        JButton btnVerTotales = new JButton("VER TOTALES");
+
+        btnVerTotales.setBackground(ROJO);
+        btnVerTotales.setForeground(BLANCO);
+        btnVerTotales.setFont(new Font("Tahoma", Font.BOLD, 13));
+        btnVerTotales.setFocusPainted(false);
+
+        panelBotones.add(btnVerTotales);
 
         contentPane.add(panelBotones, BorderLayout.SOUTH);
 
@@ -337,6 +346,7 @@ public class VentanaEmpleados extends JFrame {
         // =========================
 
         btnActualizarLista.addActionListener(e -> cargarEmpleados());
+        btnVerTotales.addActionListener(e -> verTotales());
 
         // =========================
         // SELECCIONAR FILA
@@ -608,7 +618,59 @@ public class VentanaEmpleados extends JFrame {
             );
         }
     }
+ // =====================================================
+ // VER TOTALES
+ // =====================================================
 
+ private void verTotales() {
+
+     try {
+
+         List<Empleado> empleados = empleadoServicio.listar();
+
+         if (empleados.isEmpty()) {
+
+             JOptionPane.showMessageDialog(
+                     this,
+                     "No hay empleados registrados para calcular los totales.",
+                     "Información",
+                     JOptionPane.INFORMATION_MESSAGE
+             );
+
+             return;
+         }
+
+         BigDecimal total = BigDecimal.ZERO;
+
+         for (Empleado empleado : empleados) {
+
+             total = total.add(empleado.getSalario());
+         }
+
+         BigDecimal promedio = total.divide(
+                 BigDecimal.valueOf(empleados.size()),
+                 2,
+                 java.math.RoundingMode.HALF_UP
+         );
+
+         JOptionPane.showMessageDialog(
+                 this,
+                 "Total de salarios: Q " + total
+                 + "\nPromedio de salarios: Q " + promedio,
+                 "Totales",
+                 JOptionPane.INFORMATION_MESSAGE
+         );
+
+     } catch (SQLException ex) {
+
+         JOptionPane.showMessageDialog(
+                 this,
+                 "Error al obtener los empleados:\n" + ex.getMessage(),
+                 "Error de base de datos",
+                 JOptionPane.ERROR_MESSAGE
+         );
+     }
+ }
     // =====================================================
     // LIMPIAR CAMPOS
     // =====================================================

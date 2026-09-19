@@ -4,6 +4,7 @@ public class Empleado {
 	  private int idEmpleado;
 	    private String nombreCompleto;
 	    private String puesto;
+	    private String contrato;
 	    private BigDecimal salario;
 	    private String telefono;
 	    private String correo;
@@ -11,11 +12,12 @@ public class Empleado {
 	    public Empleado() {
 	    }
 
-	    public Empleado(int idEmpleado, String nombreCompleto, String puesto,
+	    public Empleado(int idEmpleado, String nombreCompleto, String puesto, String contrato,
 	                    BigDecimal salario, String telefono, String correo) {
 	        this.idEmpleado = idEmpleado;
 	        this.nombreCompleto = nombreCompleto;
 	        this.puesto = puesto;
+	        this.contrato = contrato;
 	        this.salario = salario;
 	        this.telefono = telefono;
 	        this.correo = correo;
@@ -44,7 +46,19 @@ public class Empleado {
 	    public void setPuesto(String puesto) {
 	        this.puesto = puesto;
 	    }
+	    
 
+	    public String getContrato() {
+	    	return contrato;
+	    }
+
+	    public void setContrato(String contrato) {
+	    	this.contrato = contrato;
+	    }
+
+	    
+	    
+	    
 	    public BigDecimal getSalario() {
 	        return salario;
 	    }

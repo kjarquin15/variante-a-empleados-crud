@@ -13,7 +13,7 @@ public class EmpleadoDAO {
 
         String sql = """
                 INSERT INTO empleados
-                (nombre_completo, puesto, salario, telefono, correo)
+                (nombre_completo, puesto,contrato, salario, telefono, correo)
                 VALUES (?, ?, ?, ?, ?)
                 """;
 
@@ -25,6 +25,7 @@ public class EmpleadoDAO {
             sentencia.setBigDecimal(3, empleado.getSalario());
             sentencia.setString(4, empleado.getTelefono());
             sentencia.setString(5, empleado.getCorreo());
+            sentencia.setString(6, empleado.getContrato());
 
             sentencia.executeUpdate();
         }
